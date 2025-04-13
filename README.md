@@ -11,6 +11,9 @@ The current sample UI is made from Bootstrap and Livewire.
 ### Installation Steps
 1. Setup the prerequisites. Follow the steps in the corresponding download section or find the installation manual or steps on web.
 1. Clone this project.
+1. Ensure that your php.ini has done uncomment below, in order use dbsqlite as database:
+    - extension=pdo_sqlite
+    - extension=sqlite3
 1. Navigate into your project directory
     ``` bash
     cd todo_app
