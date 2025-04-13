@@ -9,7 +9,8 @@ class TodoController extends Controller
 {
     public function index()
     {
-        $todos = Todo::orderByDesc('created_at')
+        $todos = Todo::where('active', true)
+                    ->orderByDesc('created_at')
                     ->get();
         return view('todo', compact('todos'));
     }
@@ -22,8 +23,15 @@ class TodoController extends Controller
 
         Todo::create([
             'todo' => $request->todo,
+            'active' => true,
         ]);
 
         return redirect()->route('todos.index');
+    }
+
+    public function endSession()
+    {
+        Todo::where('active', true)->update(['active' => false]);
+        return response()->json(['status' => 'session ended']);
     }
 }

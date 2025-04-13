@@ -10,7 +10,7 @@
 <body>
 
     <h2>Add New TODO</h2>
-    <form method="POST" action="{{ route('todos.store') }}">
+    <form method="POST" action="{{ route('todos.store') }}" onsubmit="disableUnloadHandler()">
         @csrf
         <input name="todo" type="text" required autofocus>
         <button type="submit">Add TODO</button>
@@ -39,5 +39,44 @@
             @endforelse
         </tbody>
     </table>
+    <script>
+        let allowUnload = true;
+
+        function disableUnloadHandler() {
+            console.log("disableUnloadHandler")
+            allowUnload = false;
+        }
+
+        window.addEventListener("beforeunload", function (e) {
+            if (allowUnload) {
+                const url = "{{ route('todos.session.end') }}";
+                const data = new FormData();
+                data.append('_token', '{{ csrf_token() }}');
+                navigator.sendBeacon(url, data);
+            }
+        });
+
+        // Inactivity timer — still OK to call session end
+        let timeout;
+        function resetTimer() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                console.log("5min");
+                alert("Your session has ended.");
+                fetch("{{ route('todos.session.end') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    },
+                });
+            }, 5 * 60 * 1000); // 5 minutes
+        }
+
+        ['click', 'mousemove', 'keydown'].forEach(evt =>
+            window.addEventListener(evt, resetTimer)
+        );
+        resetTimer();
+    </script>
 </body>
 </html>
