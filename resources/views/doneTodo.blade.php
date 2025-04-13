@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TODO App</title>
+    <title>Done TODOs</title>
     <style>
         table { border-collapse: collapse; width: 100%; margin-top: 20px; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
@@ -9,21 +9,15 @@
 </head>
 <body>
 
-    <h2>Add New TODO</h2>
-    <form method="POST" action="{{ route('todos.store') }}" onsubmit="disableUnloadHandler()">
-        @csrf
-        <input name="todo" type="text" required autofocus>
-        <button type="submit">Add TODO</button>
-    </form>
+    <h2>Done TODO Items</h2>
 
-    <h2>Active TODOs</h2>
     <table>
         <thead>
             <tr>
                 <th>No.</th>
                 <th>TODO</th>
                 <th>Created At</th>
-                <th>Done ?</th>
+                <th>Done</th>
             </tr>
         </thead>
         <tbody>
@@ -32,28 +26,22 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $todo->todo }}</td>
                     <td>{{ $todo->created_at->format('Y-m-d H:i') }}</td>
-                    <td>
-                        <form method="POST" action="{{ route('todos.toggle', $todo->id) }}" style="display:inline;">
-                            @csrf
-                            <input type="checkbox" onchange="disableUnloadHandler(); this.form.submit()" {{ $todo->enabled ? 'checked' : '' }}>
-                        </form>
-                    </td>
+                    <td><input type="checkbox" disabled {{ $todo->done ? 'checked' : '' }}></td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">No TODOs found.</td>
+                    <td colspan="4">No active TODOs found.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
-    <a href="{{ route('todos.done') }}" onclick="disableUnloadHandler()">Go to Done TODO page</a>
+    <a href="{{ route('todos.index') }}" onclick="disableUnloadHandler()">Go to main TODO page</a>
 
     <script>
         let allowUnload = true;
 
         function disableUnloadHandler() {
-            console.log("disableUnloadHandler")
             allowUnload = false;
         }
 
@@ -72,7 +60,7 @@
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 console.log("5min");
-                alert("Your session has ended.");
+                alert("5min session ended.");
                 fetch("{{ route('todos.session.end') }}", {
                     method: 'POST',
                     headers: {
@@ -88,5 +76,6 @@
         );
         resetTimer();
     </script>
+
 </body>
 </html>
